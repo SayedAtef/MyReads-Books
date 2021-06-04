@@ -10,13 +10,7 @@ const Shelf = ({ books, shelfTitle, shelfChanger }) => {
           {books.map((book) => {
             return (
               <li key={book.id}>
-                <Book
-                  backgroundImage={book.imageLinks.thumbnail}
-                  bookTitle={book.title}
-                  authors={book.authors}
-                  shelfChanger={shelfChanger}
-                  bookToBeChanged={book}
-                />
+                <Book book={book} shelfChanger={shelfChanger} books={books} />
               </li>
             );
           })}

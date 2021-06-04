@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import * as BooksAPI from "../BooksAPI";
 import Search from "./Search";
 import Shelf from "./Shelf";
@@ -6,9 +6,14 @@ import { Link, Switch, Route } from "react-router-dom";
 
 const Home = () => {
   const [books, setBooks] = useState([]);
-  const [crB, setcrB] = useState([]);
-  const [wtrB, setwtrB] = useState([]);
-  const [rB, setrB] = useState([]);
+  const crB = useMemo(
+    () => books.filter((b) => b.shelf === "currentlyReading"),
+    [books]
+  );
+  const wtrB = useMemo(() => books.filter((b) => b.shelf === "wantToRead"), [
+    books,
+  ]);
+  const rB = useMemo(() => books.filter((b) => b.shelf === "read"), [books]);
 
   const shelfChanger = (bookToBeChanged, shelfValue) => {
     BooksAPI.update(bookToBeChanged, shelfValue).then((res) => {
@@ -25,21 +30,12 @@ const Home = () => {
       try {
         const response = await BooksAPI.getAll();
         setBooks(response);
-        setcrB(response.filter((b) => b.shelf === "currentlyReading"));
-        setwtrB(response.filter((b) => b.shelf === "wantToRead"));
-        setrB(response.filter((b) => b.shelf === "read"));
       } catch (e) {
         console.log(e);
       }
     };
     fetchBooks();
   }, []);
-
-  useEffect(() => {
-    setcrB(books.filter((b) => b.shelf === "currentlyReading"));
-    setwtrB(books.filter((b) => b.shelf === "wantToRead"));
-    setrB(books.filter((b) => b.shelf === "read"));
-  }, [books]);
 
   return (
     <Switch>

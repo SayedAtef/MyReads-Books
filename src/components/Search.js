@@ -4,24 +4,26 @@ import { Link } from "react-router-dom";
 import { search } from "../BooksAPI";
 
 const Search = ({ books, shelfChanger }) => {
-  const [values, setValues] = useState({
-    input: "",
-    result: [],
-    err: false,
-  });
+  const [input, setInput] = useState("");
+  const [result, setResult] = useState([]);
+  const [err, setErr] = useState(false);
 
   const handleChange = (e) => {
     const input = e.target.value;
-    setValues({ ...values, input });
-
+    setInput(input);
     if (input) {
       search(input.trim()).then((books) => {
-        books.length > 0
-          ? setValues({ result: books })
-          : setValues({ result: [], err: true });
+        if (books.length > 0) {
+          setResult(books);
+          setErr(false);
+        } else {
+          setResult([]);
+          setErr(true);
+        }
       });
     } else {
-      setValues({ ...values, result: [], err: false });
+      setResult([]);
+      setErr(false);
     }
   };
 
@@ -29,14 +31,14 @@ const Search = ({ books, shelfChanger }) => {
     <div className="search-books">
       <div className="search-books-bar">
         <Link to="/">
-          <button className="close-search">Close</button>
+          <div className="close-search">Close</div>
         </Link>
         <div className="search-books-input-wrapper">
           <input
             onChange={handleChange}
             type="text"
             placeholder="Search by title or author"
-            value={values.input}
+            value={input}
           />
         </div>
       </div>
@@ -44,22 +46,16 @@ const Search = ({ books, shelfChanger }) => {
       <div className="search-books-results">
         {books.length > 0 && (
           <ol className="books-grid">
-            {values.result.map((book) => {
+            {result.map((book) => {
               return (
                 <li key={book.id}>
-                  <Book
-                    backgroundImage={book.imageLinks.thumbnail}
-                    bookTitle={book.title}
-                    authors={book.authors}
-                    shelfChanger={shelfChanger}
-                    bookToBeChanged={book}
-                  />
+                  <Book book={book} shelfChanger={shelfChanger} books={books} />
                 </li>
               );
             })}
           </ol>
         )}
-        {values.err && <h2>Books Not Found! Please try again</h2>}
+        {err && <h2>Books Not Found! Please try again</h2>}
       </div>
     </div>
   );
